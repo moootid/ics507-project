@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include "matrix_utils.h"
+#include <cmath>
 
 using namespace std;
 
@@ -14,9 +15,10 @@ void multiplyMatrices(const vector<vector<long>> &A, const vector<vector<long>> 
 void parallelMultiplyMatrices(const vector<vector<long>> &A, const vector<vector<long>> &B, vector<vector<long>> &C);
 void strassenMultiply(const vector<vector<long>> &A, const vector<vector<long>> &B, vector<vector<long>> &C);
 
-const int NUM_RUNS = 3;
 const string INPUT_FILENAME = "input.txt";
-const int MATRIX_SIZE = 128;
+int NUM_RUNS = 1;
+int MATRIX_SIZE = pow(2, 9) ;
+
 double benchmark(void (*matrixMultiply)(const vector<vector<long>> &, const vector<vector<long>> &, vector<vector<long>> &), vector<vector<long>> &A, vector<vector<long>> &B, const string &method, int n)
 {
     double totalTime = 0.0;
@@ -34,11 +36,11 @@ double benchmark(void (*matrixMultiply)(const vector<vector<long>> &, const vect
     }
 
     // Write the result matrix to a file
-    string outputFilename = INPUT_FILENAME + "_" + to_string(n) + "_output_" + method + ".txt";
+    string outputFilename = "test_" + to_string(n) + "_output_" + method + ".txt";
     writeMatrix(outputFilename, C);
 
     // Write the time taken to a file
-    string infoFilename = INPUT_FILENAME + "_" + to_string(n) + "_info_" + method + ".txt";
+    string infoFilename = "test_" + to_string(n) + "_info_" + method + ".txt";
     ofstream infoFile(infoFilename);
     if (infoFile.is_open())
     {
@@ -55,22 +57,28 @@ double benchmark(void (*matrixMultiply)(const vector<vector<long>> &, const vect
 
 int main()
 {
-    generateRandomMatrix("input.txt", MATRIX_SIZE); // Regenerate random data for every run
+
     vector<vector<long>> A, B;
     int n;
 
+    generateRandomMatrix("input.txt", MATRIX_SIZE); // Regenerate random data for every run
     // Read matrices from input.txt
     readMatrix(INPUT_FILENAME, n, A, B);
-
     // Benchmark each matrix multiplication algorithm
+    printf("Benchmarking for matrix size %d\n", MATRIX_SIZE);
     double seqTime = benchmark(sequentialMatrixMultiplier, A, B, "Sequential", n);
+    printf("Sequential Matrix Multiplication: %f seconds\n", seqTime);
     double parSeqTime = benchmark(parallelSequentialMatrixMultiplier, A, B, "SequentialP", n);
+    printf("Parallelized Sequential Matrix Multiplication: %f seconds\n", parSeqTime);
     double divConqTime = benchmark(multiplyMatrices, A, B, "StraightDivAndConq", n);
+    printf("Divide and Conquer Matrix Multiplication: %f seconds\n", divConqTime);
     double parDivConqTime = benchmark(parallelMultiplyMatrices, A, B, "StraightDivAndConqP", n);
+    printf("Parallelized Divide and Conquer Matrix Multiplication: %f seconds\n", parDivConqTime);
     double strassenTime = benchmark(strassenMultiply, A, B, "StrassenDivAndConq", n);
+    printf("Strassen's Matrix Multiplication: %f seconds\n", strassenTime);
 
     // Write benchmark summary to file
-    ofstream resultsFile("benchmark_results.txt");
+    ofstream resultsFile("benchmark_results_" + to_string(n) + ".txt");
     if (resultsFile.is_open())
     {
         resultsFile << fixed << setprecision(6);

@@ -1,0 +1,1 @@
+Average time taken (seconds): 4.71919

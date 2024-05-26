@@ -1,0 +1,6 @@
+Average execution time over 3 runs:
+Sequential Matrix Multiplication: 8.099741 seconds
+Parallelized Sequential Matrix Multiplication: 0.706926 seconds
+Divide and Conquer Matrix Multiplication: 7.395805 seconds
+Parallelized Divide and Conquer Matrix Multiplication: 2.084200 seconds
+Strassen's Matrix Multiplication: 4.719190 seconds
